@@ -1,21 +1,20 @@
-from imutils.video import VideoStream
-import numpy as np
+import time
 import os
 import cv2
-from threading import Thread
+from imutils.video import VideoStream
 from tensorflow.keras.preprocessing.image import img_to_array
 import tensorflow_datasets as tfds
+import numpy as np
 
 from akida_models import mobilenet_edge_imagenet_pretrained
 from cnn2snn import convert
 from akida import Model, FullyConnected
 
-import time
 
 MODEL_FBZ = "models/edge_learning_example.fbz"
 
 CAMERA_SRC = 0
-CAMERA_FPS = 60
+CAMERA_FPS = 30
 
 NUM_NEURONS_PER_CLASS = 1
 NUM_WEIGHTS = 350
@@ -24,8 +23,20 @@ NUM_CLASSES = 10
 TARGET_WIDTH = 224
 TARGET_HEIGHT = 224
 
-LEARNING_BUTTONS = [ord(str(i)) for i in range(10)]
-SAVE_BUTTON = ord("S")
+NEURON_KEYS = {
+    48: 0,
+    49: 1,
+    50: 2,
+    51: 3,
+    52: 4,
+    53: 5,
+    54: 6,
+    55: 7,
+    56: 8,
+    57: 9,
+}
+
+SAVE_BUTTON = 115
 
 
 class Controls:
@@ -34,12 +45,12 @@ class Controls:
         self.inference = inference
 
     def capture(self):
-        if cv2.waitKey(33) in LEARNING_BUTTONS:
-            char = chr(cv2.waitKey(33))
-            print("learned class {}".format(char))
-            self.inference.learn(int(char))
+        n = cv2.waitKey(33)
+        if n in NEURON_KEYS:
+            print("learned class {}".format(NEURON_KEYS[n]))
+            self.inference.learn(NEURON_KEYS[n])
 
-        if cv2.waitKey(33) == SAVE_BUTTON:
+        if n == SAVE_BUTTON:
             print("saved model")
             self.inference.save()
 
@@ -68,21 +79,14 @@ class Camera:
         key = cv2.waitKey(1) & 0xFF
 
     def label_frame(self, frame, prediction):
-        BLACK = (255, 255, 255)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        font_size = 1
-        font_color = BLACK
-        font_thickness = 5
-        text = str(prediction)
-        x, y = 10, 30
         frame = cv2.putText(
             frame,
-            text,
-            (x, y),
-            font,
-            font_size,
-            font_color,
-            font_thickness,
+            str(prediction),
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 255),
+            5,
             cv2.LINE_AA,
         )
         return frame
