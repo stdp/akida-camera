@@ -15,14 +15,17 @@ import time
 MODEL_FBZ = "models/edge_learning_example.fbz"
 
 CAMERA_SRC = 0
-CAMERA_FPS = 30
+CAMERA_FPS = 60
 
 NUM_NEURONS_PER_CLASS = 1
 NUM_WEIGHTS = 350
-NUM_CLASSES = 3
+NUM_CLASSES = 10
 
 TARGET_WIDTH = 224
 TARGET_HEIGHT = 224
+
+LEARNING_BUTTONS = [ord(str(i)) for i in range(10)]
+SAVE_BUTTON = ord("S")
 
 
 class Controls:
@@ -31,20 +34,13 @@ class Controls:
         self.inference = inference
 
     def capture(self):
-        if cv2.waitKey(33) == ord("1"):
-            print("learn 0")
-            self.inference.learn(0)
+        if cv2.waitKey(33) in LEARNING_BUTTONS:
+            char = chr(cv2.waitKey(33))
+            print("learned class {}".format(char))
+            self.inference.learn(int(char))
 
-        if cv2.waitKey(33) == ord("2"):
-            print("learn 1")
-            self.inference.learn(1)
-
-        if cv2.waitKey(33) == ord("3"):
-            print("learn 2")
-            self.inference.learn(2)
-
-        if cv2.waitKey(33) == ord("s"):
-            print("saving model")
+        if cv2.waitKey(33) == SAVE_BUTTON:
+            print("saved model")
             self.inference.save()
 
 
@@ -65,10 +61,31 @@ class Camera:
         input_array = np.array([input_array], dtype="uint8")
         return input_array
 
-    def show_frame(self):
+    def show_frame(self, prediction):
         frame = self.get_frame()
+        frame = self.label_frame(frame, prediction)
         cv2.imshow("frame", frame)
         key = cv2.waitKey(1) & 0xFF
+
+    def label_frame(self, frame, prediction):
+        BLACK = (255, 255, 255)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_size = 1
+        font_color = BLACK
+        font_thickness = 5
+        text = str(prediction)
+        x, y = 10, 30
+        frame = cv2.putText(
+            frame,
+            text,
+            (x, y),
+            font,
+            font_size,
+            font_color,
+            font_thickness,
+            cv2.LINE_AA,
+        )
+        return frame
 
 
 class Inference:
@@ -113,7 +130,7 @@ class Inference:
     def infer(self):
         input_array = self.camera.get_input_array()
         predictions = self.model_ak.predict(input_array, num_classes=NUM_CLASSES)
-        print(predictions[0])
+        self.camera.show_frame(predictions[0])
 
 
 camera = Camera()
@@ -122,6 +139,5 @@ controls = Controls(inference)
 
 while True:
     controls.capture()
-    camera.show_frame()
     inference.infer()
     time.sleep(1 / CAMERA_FPS)
