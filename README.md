@@ -1,4 +1,4 @@
-# Learning how to use the Akida with a Camera Feed
+# Learning how to use Akida with a Camera Feed
 
 This is an extremely basic way to utilise the Akida on-chip learning functionality. The demo will let you learn new classes of objects to recognise in the camera feed.
 
@@ -13,8 +13,8 @@ This is an extremely basic way to utilise the Akida on-chip learning functionali
 ## Running and using the example
 
 1. `python3 akida_camera.py`
-2. Press `1`, `2` or `3` to save learn a new class
-3. Press `s` to save the newly learnt features into your model
+2. Press `1` to `0` on your keyboard to learn a new class
+3. Press `s` to save the newly learnt classes into your model
 
 
 ### Read More

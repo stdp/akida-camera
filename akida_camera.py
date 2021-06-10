@@ -14,7 +14,9 @@ from akida import Model, FullyConnected
 MODEL_FBZ = "models/edge_learning_example.fbz"
 
 CAMERA_SRC = 0
-CAMERA_FPS = 30
+CAMERA_FPS = 15
+
+TEXT_COLOUR = (190, 30, 255)
 
 NUM_NEURONS_PER_CLASS = 1
 NUM_WEIGHTS = 350
@@ -85,7 +87,7 @@ class Camera:
             (10, 30),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
-            (255, 255, 255),
+            TEXT_COLOUR,
             5,
             cv2.LINE_AA,
         )
