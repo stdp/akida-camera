@@ -47,7 +47,7 @@ Method to initialise an Akida model if one doesn't exist
 """
 
 
-def initialise(self):
+def initialise():
     ds, ds_info = tfds.load("coil100:2.*.*", split="train", with_info=True)
     model_keras = mobilenet_edge_imagenet_pretrained()
     # convert it to akida
