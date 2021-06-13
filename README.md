@@ -17,6 +17,13 @@ This is an extremely basic way to utilise the Akida on-chip learning functionali
 3. Press `s` to save the newly learnt classes into your model
 
 
+## One-Shot learning as seen in the BrainChip Inc demo
+
+Essentially this is a homemade version of this demonstration that BrainChip has built. You can view this in action here:
+
+[![One-Shot Learning](http://img.youtube.com/vi/xeGAiWbKa7s/0.jpg)](https://youtu.be/xeGAiWbKa7s "One-Shot Learning")
+
+
 ### Read More
 
 Read all the documentation at https://doc.brainchipinc.com
