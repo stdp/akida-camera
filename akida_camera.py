@@ -6,6 +6,7 @@ from imutils.video import VideoStream
 from tensorflow.keras.preprocessing.image import img_to_array
 import tensorflow_datasets as tfds
 import numpy as np
+from pynput import keyboard
 
 from akida_models import mobilenet_edge_imagenet_pretrained
 from cnn2snn import convert
@@ -26,20 +27,8 @@ NUM_CLASSES = 10
 TARGET_WIDTH = 224
 TARGET_HEIGHT = 224
 
-NEURON_KEYS = {
-    48: 0,
-    49: 1,
-    50: 2,
-    51: 3,
-    52: 4,
-    53: 5,
-    54: 6,
-    55: 7,
-    56: 8,
-    57: 9,
-}
-
-SAVE_BUTTON = 115
+NEURON_KEYS = [str(i) for i in range(10)]
+SAVE_BUTTON = 's'
 
 
 """
@@ -69,34 +58,44 @@ def initialise():
     model_ak.save(MODEL_FBZ)
 
 
+# create a model if one doesnt exist
+if not os.path.exists(MODEL_FBZ):
+    print("Initialising Akida model")
+    initialise()
+
+
 """
 Class to capture key presses to save/learn
 """
 
 
 class Controls:
-    def __init__(self, camera):
-        self.camera = camera
 
-    def capture(self):
-        n = cv2.waitKey(33)
-        if n in NEURON_KEYS:
-            print("learned class {}".format(NEURON_KEYS[n]))
-            self.learn(NEURON_KEYS[n])
+    def __init__(self, inference):
+        self.listener = keyboard.Listener(
+            on_press=self.on_press,
+            on_release=self.on_release)
+        self.listener.start()
+        self.inference = inference
 
-        if n == SAVE_BUTTON:
-            print("saved model")
-            self.save()
-        self.camera.show_frame()
+    def on_press(self, key):
+        global inference
+        try:
 
-    def learn(self, neuron):
-        global model_ak
-        input_array = self.camera.get_input_array()
-        model_ak.fit(input_array, neuron)
+            if key.char in NEURON_KEYS:
+                print("learned class {}".format(int(key.char)))
+                self.inference.learn(int(key.char))
 
-    def save(self):
-        global model_ak
-        model_ak.save(MODEL_FBZ)
+            if key.char == SAVE_BUTTON:
+                print("saved model to {}".format(MODEL_FBZ))
+                self.inference.save()
+
+        except AttributeError:
+            pass
+
+    def on_release(self, key):
+        if key == keyboard.Key.esc:
+            return False
 
 
 """
@@ -109,6 +108,7 @@ class Camera:
         self.stream = VideoStream(
             src=CAMERA_SRC, resolution=(TARGET_WIDTH, TARGET_HEIGHT)
         ).start()
+        self.label = 0
 
     def get_frame(self):
         frame = self.stream.read()
@@ -128,10 +128,9 @@ class Camera:
         key = cv2.waitKey(1) & 0xFF
 
     def label_frame(self, frame):
-        global label
         frame = cv2.putText(
             frame,
-            str(label),
+            str(self.label),
             (10, 30),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
@@ -140,6 +139,9 @@ class Camera:
             cv2.LINE_AA,
         )
         return frame
+
+    def set_label(self, label):
+        self.label = label
 
 
 """
@@ -151,34 +153,31 @@ class Inference:
     def __init__(self, camera):
         # init the camera
         self.camera = camera
+        # run inference in separate thread
+        self.t1 = threading.Thread(target=self.infer)
+        self.t1.start()
+        # load the akida model
+        self.model_ak = Model(filename=MODEL_FBZ)
 
     def infer(self):
-        global label
-        global model_ak
         while True:
-            input_array = self.camera.get_input_array()
-            predictions = model_ak.predict(input_array, num_classes=NUM_CLASSES)
-            label = predictions[0]
+            input_array = camera.get_input_array()
+            predictions = self.model_ak.predict(input_array, num_classes=NUM_CLASSES)
+            self.camera.set_label(predictions[0])
             time.sleep(1 / INFERENCE_PER_SECOND)
 
+    def learn(self, neuron):
+        input_array = self.camera.get_input_array()
+        self.model_ak.fit(input_array, neuron)
 
-label = 0
-# create a model if one doesnt exist
-if not os.path.exists(MODEL_FBZ):
-    print("Initialising Akida model")
-    initialise()
+    def save(self):
+        self.model_ak.save(MODEL_FBZ)
 
-# load the akida model
-model_ak = Model(filename=MODEL_FBZ)
 
 camera = Camera()
-controls = Controls(camera)
 inference = Inference(camera)
+controls = Controls(inference)
 
-# run inference in separate thread
-t1 = threading.Thread(target=inference.infer)
-t1.start()
-
-# main loop to display camera feed, key capture and labels
+# main loop to display camera feed
 while True:
-    controls.capture()
+    camera.show_frame()

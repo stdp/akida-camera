@@ -4,3 +4,4 @@ cnn2snn
 akida-models
 opencv-python
 imutils
+pynput

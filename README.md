@@ -12,7 +12,7 @@ This is an extremely basic way to utilise the Akida on-chip learning functionali
 
 ## Running and using the example
 
-1. `python3 akida_camera.py`
+1. run `python3 akida_camera.py`
 2. Press `1` to `0` on your keyboard to learn a new class
 3. Press `s` to save the newly learnt classes into your model
 
