@@ -24,6 +24,9 @@ NUM_NEURONS_PER_CLASS = 1
 NUM_WEIGHTS = 350
 NUM_CLASSES = 10
 
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
+
 TARGET_WIDTH = 224
 TARGET_HEIGHT = 224
 
@@ -106,13 +109,12 @@ Class to capture video feed from webcam
 class Camera:
     def __init__(self):
         self.stream = VideoStream(
-            src=CAMERA_SRC, resolution=(TARGET_WIDTH, TARGET_HEIGHT)
+            src=CAMERA_SRC, resolution=(FRAME_WIDTH, FRAME_HEIGHT)
         ).start()
         self.label = 0
 
     def get_frame(self):
-        frame = self.stream.read()
-        frame = cv2.resize(frame, (TARGET_WIDTH, TARGET_HEIGHT))
+        frame = cv2.resize(self.stream.read(), (TARGET_WIDTH, TARGET_HEIGHT))
         return frame
 
     def get_input_array(self):
@@ -122,8 +124,7 @@ class Camera:
         return input_array
 
     def show_frame(self):
-        frame = cv2.resize(self.stream.read(), (TARGET_WIDTH, TARGET_HEIGHT))
-        frame = self.label_frame(frame)
+        frame = self.label_frame(self.stream.read())
         cv2.imshow("frame", frame)
         key = cv2.waitKey(1) & 0xFF
 
