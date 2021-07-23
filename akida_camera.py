@@ -202,7 +202,7 @@ class Inference:
 
         input_array = self.camera.get_input_array()
         self.model_ak.fit(input_array, neuron)
-        self.camera.set_label("Learned {}".format(LABELS.get(neuron, neuron)))
+        self.camera.label = "Learned {}".format(LABELS.get(neuron, neuron))
 
     def save(self):
         self.model_ak.save(MODEL_FBZ)
