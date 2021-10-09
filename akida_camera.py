@@ -167,14 +167,14 @@ class Inference:
         model_keras = mobilenet_edge_imagenet_pretrained()
 
         # convert it to an Akida model
-        model_ak = convert(model_keras, input_scaling=(128, 128))
+        model_ak = convert(model_keras)
 
         # remove the last layer of network, replace with Akida learning layer
         model_ak.pop_layer()
         layer_fc = FullyConnected(
             name="akida_edge_layer",
-            num_neurons=NUM_CLASSES * NUM_NEURONS_PER_CLASS,
-            activations_enabled=False,
+            units=NUM_CLASSES * NUM_NEURONS_PER_CLASS,
+            activation=False,
         )
         # add learning layer to end of model
         model_ak.add(layer_fc)
