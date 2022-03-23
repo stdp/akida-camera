@@ -7,12 +7,12 @@ from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
 from pynput import keyboard
 
-from akida_models import mobilenet_edge_imagenet_pretrained
+from akida_models import akidanet_edge_imagenet_pretrained
 from cnn2snn import convert
-from akida import Model, FullyConnected
+from akida import Model, FullyConnected, devices
 
 
-OUTPUT = False
+OUTPUT = True
 OUTPUT_VID = "out.avi"
 OUTPUT_FPS = 30
 
@@ -89,7 +89,7 @@ class Camera:
         if OUTPUT:
             self.out = cv2.VideoWriter(
                 OUTPUT_VID,
-                cv2.VideoWriter_fourcc("M", "J", "P", "G"),
+                cv2.VideoWriter_fourcc(*"XVID"),
                 OUTPUT_FPS,
                 (FRAME_WIDTH, FRAME_HEIGHT),
             )
@@ -157,6 +157,10 @@ class Inference:
         # load the akida model
         self.model_ak = Model(filename=MODEL_FBZ)
 
+        if len(devices()) > 0:
+            device = devices()[0]
+            self.model_ak.map(device)
+
     def initialise(self):
 
         """
@@ -164,7 +168,7 @@ class Inference:
         """
 
         # fetch pretrained imagenet
-        model_keras = mobilenet_edge_imagenet_pretrained()
+        model_keras = akidanet_edge_imagenet_pretrained()
 
         # convert it to an Akida model
         model_ak = convert(model_keras)
@@ -187,7 +191,8 @@ class Inference:
     def infer(self):
         while True:
             input_array = camera.get_input_array()
-            predictions = self.model_ak.predict(input_array, num_classes=NUM_CLASSES)
+            predictions = self.model_ak.predict_classes(input_array, num_classes=NUM_CLASSES)
+            print(predictions)
             if predictions[0] in SAVED:
                 self.camera.label = LABELS.get(predictions[0], predictions[0])
                 self.camera.shots = "{} shot/s".format(SHOTS.get(predictions[0]))
