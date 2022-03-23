@@ -12,7 +12,7 @@ from cnn2snn import convert
 from akida import Model, FullyConnected, devices
 
 
-OUTPUT = True
+OUTPUT = False
 OUTPUT_VID = "out.avi"
 OUTPUT_FPS = 30
 
