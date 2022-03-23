@@ -192,7 +192,6 @@ class Inference:
         while True:
             input_array = camera.get_input_array()
             predictions = self.model_ak.predict_classes(input_array, num_classes=NUM_CLASSES)
-            print(predictions)
             if predictions[0] in SAVED:
                 self.camera.label = LABELS.get(predictions[0], predictions[0])
                 self.camera.shots = "{} shot/s".format(SHOTS.get(predictions[0]))

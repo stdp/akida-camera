@@ -21,7 +21,7 @@ STDP  is  possible  because  of  the  event-based processing method used by the 
 
 1. Go to `https://www.anaconda.com/download/` and download the installer
 2. Install Anaconda by running `bash Anaconda-latest-Linux-x86_64.sh`
-3. Once installed, create a conda environment `conda create --name akida_env python=3.6`
+3. Once installed, create a conda environment `conda create --name akida_env python=3.7`
 4. Activate the new conda environment `conda activate akida_env`
 5. Install the python dependencies `pip install -r requirements.txt`
 
