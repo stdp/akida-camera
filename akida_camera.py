@@ -21,8 +21,6 @@ CAMERA_SRC = 0
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 
-TEXT_COLOUR = (190, 30, 255)
-
 MODEL_FBZ = "models/edge_learning_example.fbz"
 
 NEURON_KEYS = [str(i) for i in range(10)]
@@ -38,6 +36,7 @@ COLOURS = {
     6: Color(0, 0, 255),
     7: Color(255, 0, 255),
 }
+
 
 class Camera:
     def __init__(self):
@@ -158,7 +157,6 @@ class Inference:
         self.controls = Controls(self)
         self.lights = WS2812Controller(LED_PIN, NUM_LEDS)
         self.saved = []
-        self.labels = {}
 
         # load the akida model
         self.model_ak = AkidaModel(filename=MODEL_FBZ)
@@ -209,17 +207,12 @@ class Inference:
             predicted_class = int(predictions[0])
             if predicted_class in self.saved:
                 self.lights.show_colour(predicted_class)
-            #time.sleep(0.0001)
 
     def learn(self, neuron):
         input_array = self.camera.get_input_array(224, 224)
         self.model_ak.fit(input_array, neuron)
         if neuron not in self.saved:
             self.saved.append(neuron)
-            self.camera.shots[neuron] = 1
-        else:
-            self.camera.shots[neuron] += 1
-        self.camera.label = "Learned {}".format(self.labels.get(neuron, neuron))
 
     def save(self):
         self.model_ak.save(MODEL_FBZ)
