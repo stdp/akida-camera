@@ -98,9 +98,15 @@ class WS2812Controller:
         self.strip.begin()
         self.cleanup()
 
+    def spotlight(self):
+        for i in range(self.num_leds):
+            self.strip.setPixelColor(i, Color(255, 255, 255))
+        self.strip.show()
+
     def show_colour(self, index):
         self.cleanup()
-        self.strip.setPixelColor(index, self.colours[index])
+        for i in range(self.num_leds):
+            self.strip.setPixelColor(i, self.colours[index])
         self.strip.show()
 
     def cleanup(self):
@@ -154,8 +160,9 @@ class Inference:
             self.initialise()
 
         self.camera = Camera()
-        self.controls = Controls(self)
         self.lights = WS2812Controller(LED_PIN, NUM_LEDS)
+        self.controls = Controls(self)
+
         self.saved = []
 
         # load the akida model
