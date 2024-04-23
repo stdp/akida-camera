@@ -1,6 +1,4 @@
 akida
-cnn2snn
 akida-models
-opencv-python
-imutils
+rpi_ws281x
 pynput

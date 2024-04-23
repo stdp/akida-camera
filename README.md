@@ -1,50 +1,80 @@
 # Learning how to use Akida with a Camera Feed
 
-This is an extremely basic way to utilise the Akida on-chip learning functionality. The demo will let you learn new classes of objects to recognise in the camera feed. This application is built to soley demonstrate how easy it is to use Akida's unique one-shot/few shot learning abilities.
+This is an extremely basic way to utilise the Akida on-chip learning functionality. The demo will let you learn new classes of objects to recognise in the camera feed. This application is built to soley demonstrate how easy it is to use Akida's unique one-shot/few shot learning abilities. Instead of text labels, the system uses RGB LED's to represent the class that has been predicted.
 
-
-## How Does Akida Learn?
-
+### How Does Akida Learn?
 
 In  native  learning  mode,  event  domain  neurons  learn quickly through a biological process known as Spike Time Dependent Plasticity (STDP), in which synapses that match an activation pattern are reinforced. BrainChip is utilizing a naturally homeostatic form of STDP learning in which neurons don’t saturate or switch off completely. 
 
-STDP  is  possible  because  of  the  event-based processing method used by the Akida processor, and can be applied to incremental learning and one-shot or multi-shot learning. 
+STDP  is  possible  because  of  the  event-based processing method used by the Akida processor, and can be applied to incremental learning and one-shot or multi-shot learning.
 
 **Read more:**
 
-[What Is the Akida Event Domain Neural Processor?](https://brainchipinc.com/what-is-the-akida-event-domain-neural-processor/)
+[What Is the Akida Event Domain Neural Processor?](https://brainchip.com/akida-foundations/)
 
-[MetaTF Documentation](https://doc.brainchipinc.com)
+[MetaTF Documentation](https://doc.brainchipinc.com) 
 
+## Prerequisites
 
-### Setting up the Akida development environment
+- Raspberry Pi 4 Compute Model with an IO Board
+- PCI-e Akida Neuromorphic Processor [link](https://shop.brainchipinc.com/products/akida%E2%84%A2-development-kit-pcie-board)
+- Raspberry Pi Camera Module
+- WS2812 compatible RGB LEDs [link](https://core-electronics.com.au/neopixel-stick-8-x-ws2812-5050-rgb-led-with-integrated-drivers.html)
+- Python 3.8 or higher
+- A stable internet connection for setup and API interactions with ChatGPT
 
-1. Go to `https://www.anaconda.com/download/` and download the installer
-2. Install Anaconda by running `bash Anaconda-latest-Linux-x86_64.sh`
-3. Once installed, create a conda environment `conda create --name akida_env python=3.7`
-4. Activate the new conda environment `conda activate akida_env`
-5. Install the python dependencies `pip install -r requirements.txt`
+![Akida Neuromorphic SoC](https://i.imgur.com/g8YCnaX.jpeg)
 
+![WS2812 compatible RGB LEDs](https://i.imgur.com/zg9xneM.png)
 
-### Running and using the app
+## Installation
 
-1. run `python3 akida_camera.py`
-2. Press `1` to `0` on your keyboard to learn a new class
-3. Press `s` to save the newly learnt classes into your model
+### Setup the Hardware
+1. Connect the Raspberry Pi Camera to the Raspberry Pi 4 Compute Model.
+2. Ensure the Akida Neuromorphic Processor is correctly installed in the PCI-e slot on the IO Board and the drivers are installed. [link to instructions](https://brainchip.com/support-akida-pcie-board)
+3. Conect the WS2812 compatible RGB LED's wiring to the 5v, GROUND and GPIO 18
 
+### Prepare the Software Environment
+1. Create a virtual environment with access to system packages (required for `picamera2` module):
+   ```bash
+   python3 -m venv venv --system-site-packages
+   source venv/bin/activate
+   ```
 
-### Customise the labels
+2. Clone the repository:
+   ```bash
+    git clone https://github.com/stdp/akida-camera.git
+    cd akida-camera
+    ```
 
-1. Edit the dict `LABELS = {0: "Background"}`
-2. Add as many labels as required, ensure there are enough classes available in the model `NUM_CLASSES = 10`
+3. Install the required Python modules:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
+## Usage
 
-### Record a demonstration
+To start the Inference system, ensure your virtual environment is activated and follow the steps below. Python must be run as sudo for the LEDs to function:
 
-1. Change the output setting `OUTPUT = True`
-2. Enter a filename if required, defaults to `out.avi`
-> **Important:** Remember to contact `sales@brainchipinc.com` to seek permission before publishing any demonstration videos
+1. get your virtualenv python path
+``` bash
+which python
 
+# example output "/home/neuro/projects/akida-camera/venv/bin/python"
+```
+
+2. copy the output of this and run the follow command, replacing python path with the output from the previous step:
+```bash
+sudo <python path> neurocam.py
+
+# example command "sudo /home/neuro/projects/akida-camera/venv/bin/python akida_camera.py"
+```
+
+## Controlling the app
+
+1. Press `1` to `0` on your keyboard to learn a new class, numbers 1 through 7 will be a RGB colour, 0 will be black (or off)
+
+2. Press `s` to save the newly learnt classes into your model (delete the model file to re-initialise a blank slate)
 
 ## One-Shot learning as seen in the BrainChip Inc demo
 
