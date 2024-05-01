@@ -21,7 +21,6 @@ STDP  is  possible  because  of  the  event-based processing method used by the 
 - Raspberry Pi Camera Module
 - WS2812 compatible RGB LEDs [link](https://core-electronics.com.au/neopixel-stick-8-x-ws2812-5050-rgb-led-with-integrated-drivers.html)
 - Python 3.8 or higher
-- A stable internet connection for setup and API interactions with ChatGPT
 
 ![Akida Neuromorphic SoC](https://i.imgur.com/g8YCnaX.jpeg)
 
